@@ -8,6 +8,25 @@
 + We then print out the result of the request.
 
 ## Reflection II
+![image](/assets/images/commit2.png)
++ So we added it so we can display a simple html page that can be rendered by the browser
++ we do this first by making a a html file that we want to display, in this case `hello.html`
++ we then import `fs` so we can read and convert `hello.html` into `contents` as part of `response` that will be sent through the TCP stream.
+```
+let contents = fs::read_to_string("hello.html").unwrap(); 
+```
++ Next we will make the othe companents components for the response that is  `status_line` and `Content_Length`(for content length we can just use `.length()` the content)
+```
+let status_line = "HTTP/1.1 200 OK"; 
+```
++ After that we put together the response like so: 
+```
+let response = format!("{status_line}\r\nContent-Length: {length}\r\n\r\n{contents}");
+```
++ Then we convert the response string into a byte slice, and `write_all` writes the entire byte slice to the TCP stream. This sends the response back to the client
+```
+stream.write_all(response.as_bytes()).unwrap();
+```
 
 ## Reflection III
 
