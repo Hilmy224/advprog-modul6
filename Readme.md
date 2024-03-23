@@ -1,5 +1,5 @@
 # Module 6
-## Reflection I
+## Commit I Reflection Notes
 + After Importing `use std::net::{TcpListener, TcpStream};`, we will bound it to a specified address in this case `127.0.0.1:7878` and unwrap it as listener. 
 + It then accept connections and process them serially with the for loop. 
 + We made a `handle_connection(mut stream: TcpStream)` function to process each connection.
@@ -7,7 +7,7 @@
 > A BufReader<R> performs large, infrequent reads on the underlying Read and maintains an in-memory buffer of the results BufReader<R> can improve the speed of programs that make small and repeated read calls to the same file or network socket.
 + We then print out the result of the request.
 
-## Reflection II
+## Commit II Reflection Notes
 ![image](/assets/images/commit2.png)
 + So we added it so we can display a simple html page that can be rendered by the browser
 + we do this first by making a a html file that we want to display, in this case `hello.html`
@@ -28,8 +28,47 @@ let response = format!("{status_line}\r\nContent-Length: {length}\r\n\r\n{conten
 stream.write_all(response.as_bytes()).unwrap();
 ```
 
-## Reflection III
+## Commit III Reflection Notes
+![image2](/assets/images/commit3failed.png)
++ How we differentiate between response is first modify our `buf_reader` to be reading the first line of the HTTP request instead of mapping the whole thing into a vector and saving it inside `request_line`.
+```
+let request_line = buf_reader.lines().next().unwrap().unwrap();
+```
++ We the check the content of `request_line` wether if it equals the request line of a GET request to the / path. If it does, the if block returns the contents of our HTML file and If the request_line does not equal the GET request to the / path, it means we’ve received some other request.
+```
+if request_line == "GET / HTTP/1.1"
+```
++ Thats when those other request will be handled in the else block. The response we will give out a status line with status code 404 and the reason phrase NOT FOUND. The content of the response will be the HTML in the file 404.html.
+```
+else {
+        let status_line = "HTTP/1.1 404 NOT FOUND";
+        let contents = fs::read_to_string("404.html").unwrap();
+        let length = contents.len();
 
-## Reflection IV
+        let response = format!(
+            "{status_line}\r\nContent-Length: {length}\r\n\r\n{contents}"
+        );
 
-## Reflection V
+        stream.write_all(response.as_bytes()).unwrap();
+    }
+```
++ After reviewing the code we can tell the code is a bit repetitive with both reading files and writing the contents of the files to the stream. We can make the code more readible and concise by modifying the if blocks to instead just check for the request line and assign (status_line, filename) appropiately without reading and writing the content files again:
+```
+//Refactored if else blocks
+let (status_line, filename) = if request_line == "GET / HTTP/1.1" {
+        ("HTTP/1.1 200 OK", "hello.html")
+    } else {
+        ("HTTP/1.1 404 NOT FOUND", "404.html")
+    };
+
+    let contents = fs::read_to_string(filename).unwrap();
+    let length = contents.len();
+
+    let response =
+        format!("{status_line}\r\nContent-Length: {length}\r\n\r\n{contents}");
+
+    stream.write_all(response.as_bytes()).unwrap();
+```
+## Commit IV Reflection Notes
+
+## Commit V Reflection Notes
