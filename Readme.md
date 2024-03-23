@@ -70,5 +70,17 @@ let (status_line, filename) = if request_line == "GET / HTTP/1.1" {
     stream.write_all(response.as_bytes()).unwrap();
 ```
 ## Commit IV Reflection Notes
-
++ The first change we did is transitioning from using if statements to `match` expressions now that we have three distinct cases to handle.
++ The first case handles the if block and the third case handles the else block of the previous code. On the otherhand, the second case it handles requests to /sleep, causing the server to pause for 10 seconds before rendering the HTML page.
+```
+...
+"GET /sleep HTTP/1.1" => {
+            thread::sleep(Duration::from_secs(10)); 
+            ("HTTP/1.1 200 OK", "hello.html") 
+        }
+...
+```
++ After running the program we can observe that the delay between requesting something in another browser window after `http://127.0.0.1:7878/sleep` will result on a 10 second delay as it waits for the /sleep request to complete its 10-second sleep.
+> thread::sleep = Puts the current thread to sleep for at least the specified amount of time. (Dont forget to Import thread)
+> time::Duration = A Duration type to represent a span of time, typically used for system timeouts.
 ## Commit V Reflection Notes
