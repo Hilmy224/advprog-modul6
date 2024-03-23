@@ -89,3 +89,13 @@ let (status_line, filename) = if request_line == "GET / HTTP/1.1" {
 + This ensures that when the ThreadPool receives a request to execute a task, a signal is dispatched via the sender to the relevant Worker's receiver, which then processes the job.
 + Within each Worker, there's a single thread consistently awaiting incoming data. Upon receiving the data, the Worker locks the receiver to process it. 
 + Upon completion, the lock on the receiver is released, allowing other Workers to receive information and execute subsequent tasks.
+
+## Commit Bonus Reflection Notes
++ The change between `new` to `build` allows us to create the thread with  while a more structured construction process with additional validation and error handling, providing better clarity and control over the creation process compared to `new`. In this case we can validate the `size`variable when building the thread.
+```
+...
+if size <=0 {
+            return Err("ThreadPool size must be greater than 0.")
+        }
+...
+```
