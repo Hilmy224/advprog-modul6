@@ -84,3 +84,8 @@ let (status_line, filename) = if request_line == "GET / HTTP/1.1" {
 > thread::sleep = Puts the current thread to sleep for at least the specified amount of time. (Dont forget to Import thread)
 > time::Duration = A Duration type to represent a span of time, typically used for system timeouts.
 ## Commit V Reflection Notes
++ To implement an efficient system using multithreading, it's ideal to construct a ThreadPool that enables simultaneous handling of various requests. 
++ The next step involves creating Workers, tasked with receiving and executing specific jobs or tasks sent to each request. Smooth communication between the ThreadPool and each Worker necessitates setting up a messaging mechanism, where the ThreadPool can send signals via a sender to cloned receivers assigned to each Worker. 
++ This ensures that when the ThreadPool receives a request to execute a task, a signal is dispatched via the sender to the relevant Worker's receiver, which then processes the job.
++ Within each Worker, there's a single thread consistently awaiting incoming data. Upon receiving the data, the Worker locks the receiver to process it. 
++ Upon completion, the lock on the receiver is released, allowing other Workers to receive information and execute subsequent tasks.
